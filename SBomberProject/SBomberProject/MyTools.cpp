@@ -20,18 +20,18 @@ namespace MyTools {
 
     //=============================================================================================
 
-    void ClrScr()
+    void ScreenSingleton::ClrScr()
     {
         system("cls");
     }
 
-    void __fastcall GotoXY(double x, double y)
+    void __fastcall ScreenSingleton::GotoXY(double x, double y)
     {
         const COORD cc = { short(x), short(y) };
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cc);
     }
 
-    uint16_t GetMaxX()
+    uint16_t ScreenSingleton::GetMaxX()
     {
         HANDLE hWndConsole;
         if (hWndConsole = GetStdHandle(-12))
@@ -47,7 +47,7 @@ namespace MyTools {
         return 0;
     }
 
-    uint16_t GetMaxY()
+    uint16_t ScreenSingleton::GetMaxY()
     {
         HANDLE hWndConsole;
         if (hWndConsole = GetStdHandle(-12))
@@ -62,7 +62,7 @@ namespace MyTools {
         return 0;
     }
 
-    void SetColor(ConsoleColor color)
+    void ScreenSingleton::SetColor(ConsoleColor color)
     {
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleTextAttribute(hConsole, color); // color =  (WORD)((BackgroundColor << 4) | TextColor))
@@ -70,12 +70,12 @@ namespace MyTools {
 
     //=============================================================================================
 
-    void __fastcall OpenLogFile(const string& FN)
+    void __fastcall FileLoggerSingleton::OpenLogFile(const string& FN)
     {
         logOut.open(FN, ios_base::out);
     }
 
-    void CloseLogFile()
+    void FileLoggerSingleton::CloseLogFile()
     {
         if (logOut.is_open())
         {
@@ -93,7 +93,7 @@ namespace MyTools {
         return string(buf);
     }
 
-    void __fastcall WriteToLog(const string& str)
+    void __fastcall FileLoggerSingleton::WriteToLog(const string& str)
     {
         if (logOut.is_open())
         {
@@ -101,7 +101,7 @@ namespace MyTools {
         }
     }
 
-    void __fastcall WriteToLog(const string& str, int n)
+    void __fastcall FileLoggerSingleton::WriteToLog(const string& str, int n)
     {
         if (logOut.is_open())
         {
@@ -109,7 +109,7 @@ namespace MyTools {
         }
     }
 
-    void __fastcall WriteToLog(const string& str, double d)
+    void __fastcall FileLoggerSingleton::WriteToLog(const string& str, double d)
     {
         if (logOut.is_open())
         {
@@ -119,5 +119,48 @@ namespace MyTools {
 
     //=============================================================================================
 
+    int LogNumber{ 1 };
+
+    bool LoggerSingleton::CheckAccess() {
+        return true;
+    };
+
+    void __fastcall LoggerSingleton::OpenLogFile(const std::string& FN) { 
+        if (CheckAccess()) RealObject.OpenLogFile(FN); 
+    }
+
+    void LoggerSingleton::CloseLogFile() {
+        if (CheckAccess()) RealObject.CloseLogFile(); 
+    };
+
+    void __fastcall LoggerSingleton::WriteLogNumber(int& num) {
+        if (logOut.is_open()) {
+            logOut << num << " - ";
+            num++;
+        }
+    };
+
+    void __fastcall LoggerSingleton::WriteToLog(const std::string& str) {
+        if (CheckAccess()) {
+            WriteLogNumber(LogNumber);
+            RealObject.WriteToLog(str);
+        }
+    };
+
+    void __fastcall LoggerSingleton::WriteToLog(const std::string& str, int n) {
+        if (CheckAccess()) {
+            WriteLogNumber(LogNumber);
+            RealObject.WriteToLog(str, n);
+        }
+    };
+
+    void __fastcall LoggerSingleton::WriteToLog(const std::string& str, double d) {
+        if (CheckAccess()) {
+            WriteLogNumber(LogNumber);
+            RealObject.WriteToLog(str, d);
+        }
+    };
+
+    //=============================================================================================
 
 } // namespace MyTools
