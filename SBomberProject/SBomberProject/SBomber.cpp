@@ -123,22 +123,24 @@ void SBomber::CheckPlaneAndLevelGUI()
 
 void SBomber::CheckBombsAndGround() 
 {
-    vector<Bomb*> vecBombs = FindAllBombs();
+    vector<BombDecorator*> vecBombsDecorator = FindAllBombsDecorator();
     Ground* pGround = FindGround();
     const double y = pGround->GetY();
-    for (size_t i = 0; i < vecBombs.size(); i++)
+    for (size_t i = 0; i < vecBombsDecorator.size(); i++)
     {
-        if (vecBombs[i]->GetY() >= y) // Пересечение бомбы с землей
+        if (vecBombsDecorator[i]->GetY() >= y) // Пересечение бомбы с землей
         {
-            pGround->AddCrater(vecBombs[i]->GetX());
-            CheckDestoyableObjects(vecBombs[i]);
-            DeleteDynamicObj(vecBombs[i]);
+            pGround->AddCrater(vecBombsDecorator[i]->GetX());
+            CheckDestoyableObjects(vecBombsDecorator[i]);
+            //DeleteDynamicObj(vecBombs[i]);
+            Command* deleteCommand = new DeleteObjectCommand<DynamicObject>(vecBombsDecorator[i], vecDynamicObj);
+            CommandExecuter(deleteCommand);
         }
     }
 
 }
 
-void SBomber::CheckDestoyableObjects(Bomb * pBomb)
+void SBomber::CheckDestoyableObjects(BombDecorator * pBomb)
 {
     vector<DestroyableGroundObject*> vecDestoyableObjects = FindDestoyableGroundObjects();
     const double size = pBomb->GetWidth();
@@ -150,7 +152,10 @@ void SBomber::CheckDestoyableObjects(Bomb * pBomb)
         if (vecDestoyableObjects[i]->isInside(x1, x2))
         {
             score += vecDestoyableObjects[i]->GetScore();
-            DeleteStaticObj(vecDestoyableObjects[i]);
+            //DeleteStaticObj(vecDestoyableObjects[i]);
+            Command* deleteCommand = new DeleteObjectCommand<GameObject>(vecDestoyableObjects[i], vecStaticObj);
+            CommandExecuter(deleteCommand);
+
         }
     }
 }
@@ -238,6 +243,24 @@ vector<Bomb*> SBomber::FindAllBombs() const
     return vecBombs;
 }
 
+vector<BombDecorator*> SBomber::FindAllBombsDecorator() const
+{
+    vector<BombDecorator*> vecBombsDecorator;
+
+    for (size_t i = 0; i < vecDynamicObj.size(); i++)
+    {
+        BombDecorator* pBomb = dynamic_cast<BombDecorator*>(vecDynamicObj[i]);
+        if (pBomb != nullptr)
+        {
+            vecBombsDecorator.push_back(pBomb);
+        }
+    }
+
+    return vecBombsDecorator;
+}
+
+
+
 Plane* SBomber::FindPlane() const
 {
     for (size_t i = 0; i < vecDynamicObj.size(); i++)
@@ -292,11 +315,29 @@ void SBomber::ProcessKBHit()
         break;
 
     case 'b':
-        DropBomb();
+        //DropBomb();
+        if (bombsNumber > 0)
+        {
+            LoggerSingleton(FileLoggerSingleton::getInstance()).WriteToLog(string(__FUNCTION__) + " was invoked");
+            Plane* pPlane = FindPlane();
+            Command* dropBombCommand = new DropBombCommand(pPlane, vecDynamicObj);
+            CommandExecuter(dropBombCommand);
+            bombsNumber--;
+            score -= Bomb::BombCost;
+        }
         break;
 
     case 'B':
-        DropBomb();
+        //DropBomb();
+        if (bombsNumber > 0)
+        {
+            LoggerSingleton(FileLoggerSingleton::getInstance()).WriteToLog(string(__FUNCTION__) + " was invoked");
+            Plane* pPlane = FindPlane();
+            Command* dropBombCommand = new DropBombCommand(pPlane, vecDynamicObj);
+            CommandExecuter(dropBombCommand);
+            bombsNumber--;
+            score -= Bomb::BombCost;
+        }
         break;
 
     default:
