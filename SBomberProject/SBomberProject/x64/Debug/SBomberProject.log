@@ -1,11 +1,8 @@
 ﻿  Bomb.cpp
-  Ground.cpp
-  House.cpp
-  LevelGUI.cpp
-  MyTools.cpp
-  Plane.cpp
+C:\Users\Danil\Desktop\SBomberProject\SBomberProject\Bomb.h(24,18): warning C4244: 'argument': conversion from 'double' to 'uint16_t', possible loss of data
   SBomber.cpp
+C:\Users\Danil\Desktop\SBomberProject\SBomberProject\Bomb.h(24,18): warning C4244: 'argument': conversion from 'double' to 'uint16_t', possible loss of data
   SBomberProject.cpp
-  Tank.cpp
+C:\Users\Danil\Desktop\SBomberProject\SBomberProject\Bomb.h(24,18): warning C4244: 'argument': conversion from 'double' to 'uint16_t', possible loss of data
   Generating Code...
   SBomberProject.vcxproj -> C:\Users\Danil\Desktop\SBomberProject\x64\Debug\SBomberProject.exe
